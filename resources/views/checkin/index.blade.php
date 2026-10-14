@@ -44,46 +44,47 @@
 
         // Fungsi untuk membunyikan Audio Beep menggunakan Web Audio API
         function playSound(type) {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
 
-            if (type === 'success') {
-                // Suara Beep Tinggi (Sukses)
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frekuensi nada tinggi
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.15); // Durasi 150ms
-            } else if (type === 'warning') {
-                // Suara Beep Dua Kali Pendek (Sudah Pernah Hadir)
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.1);
-                
-                setTimeout(() => {
-                    const osc2 = audioCtx.createOscillator();
-                    const gain2 = audioCtx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.type = 'triangle';
-                    osc2.frequency.setValueAtTime(400, audioCtx.currentTime);
-                    gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    osc2.start();
-                    osc2.stop(audioCtx.currentTime + 0.1);
-                }, 150);
-            } else {
-                // Suara Beep Rendah/Kasar (Gagal / Error)
-                oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); // Frekuensi rendah
-                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.3); // Durasi 300ms
+                if (type === 'success') {
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'warning') {
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                    
+                    setTimeout(() => {
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.type = 'triangle';
+                        osc2.frequency.setValueAtTime(400, audioCtx.currentTime);
+                        gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        osc2.start();
+                        osc2.stop(audioCtx.currentTime + 0.1);
+                    }, 150);
+                } else {
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (e) {
+                console.log("Audio not supported or blocked by browser.");
             }
         }
 
@@ -126,21 +127,31 @@
             }
         });
 
-        // Inisialisasi Kamera QR Scanner
-        function onScanSuccess(decodedText, decodedResult) {
-            // Hentikan sementara scan agar tidak spam request
-            html5QrcodeScanner.clear();
-            processCheckin(decodedText);
-            
-            // Nyalakan kembali scanner setelah 3 detik
-            setTimeout(() => {
-                html5QrcodeScanner.render(onScanSuccess);
-            }, 3000);
-        }
+        // Inisialisasi Kamera QR Scanner dengan aman setelah DOM siap
+        document.addEventListener("DOMContentLoaded", function () {
+            let html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", 
+                { fps: 10, qrbox: 250 }, 
+                false
+            );
 
-        const html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 }, /* verbose=false */);
-        html5QrcodeScanner.render(onScanSuccess);
+            function onScanSuccess(decodedText, decodedResult) {
+                // Proses check-in tanpa harus clear scanner agar kamera tidak error / restart ulang
+                processCheckin(decodedText);
+                
+                // Jeda 3 detik sebelum bisa scan QR code berikutnya agar tidak spam request
+                html5QrcodeScanner.pause();
+                setTimeout(() => {
+                    html5QrcodeScanner.resume();
+                }, 3000);
+            }
+
+            function onScanError(errorMessage) {
+                // Abaikan error minor saat frame kamera sedang mencari QR code
+            }
+
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        });
     </script>
 </body>
 </html>
