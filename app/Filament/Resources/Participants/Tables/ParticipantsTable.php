@@ -24,10 +24,6 @@ class ParticipantsTable
     {
         return $table
             ->columns([
-                TextColumn::make('event.name')
-                    ->sortable()
-                    ->searchable()
-                    ->label('Acara'),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
@@ -91,6 +87,7 @@ class ParticipantsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     BulkAction::make('blastCertificate')
                         ->label('Blast E-Certificate WhatsApp')
                         ->icon('heroicon-o-paper-airplane')
