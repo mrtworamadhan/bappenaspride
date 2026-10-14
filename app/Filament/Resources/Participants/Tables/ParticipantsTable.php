@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Participants\Tables;
 
+use App\Models\Participant;
 use App\Services\FonnteService;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -13,6 +15,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Barryvdh\DomPDF\Facade\Pdf; // Jika nanti mau export PDF, atau kita buat CSV/Excel bawaan PHP
+use Illuminate\Support\Facades\Response;
 
 class ParticipantsTable
 {
@@ -66,6 +70,21 @@ class ParticipantsTable
                 SelectFilter::make('event_id')
                     ->relationship('event', 'name')
                     ->label('Filter Acara'),
+            ])
+            ->headerActions([
+                Action::make('exportParticipantsPdf')
+                    ->label('Download Daftar Terdaftar (PDF)')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('info')
+                    ->url(fn () => route('report.registered.pdf'))
+                    ->openUrlInNewTab(),
+
+                Action::make('exportAttendancePdf')
+                    ->label('Download Daftar Hadir & TTD (PDF)')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->url(fn () => route('report.attendance.pdf'))
+                    ->openUrlInNewTab(),
             ])
             ->recordActions([
                 EditAction::make(),
