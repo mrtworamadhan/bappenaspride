@@ -21,6 +21,9 @@ class ReportController extends Controller
     // Download PDF Daftar Hadir (Lengkap dengan TTD Digital)
     public function downloadAttendancePdf()
     {
+        ini_set('max_execution_time', 300); // 5 menit
+        ini_set('memory_limit', '512M');
+        
         $participants = Participant::with('event')
                         ->where('attendance_status', 'present')
                         ->get();

@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title>Daftar Hadir & Tanda Tangan</title>
     <style>
-        body { font-family: sans-serif; font-size: 10pt; color: #333; }
-        h2 { text-align: center; margin-bottom: 5px; }
-        p.subtitle { text-align: center; font-size: 9pt; color: #666; margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; vertical-align: middle; }
-        th { background-color: #f2f2f2; font-size: 9.5pt; text-align: center; }
-        td { font-size: 9pt; }
-        .signature-img { width: 90px; height: 40px; object-fit: contain; }
+        body { font-family: sans-serif; font-size: 9pt; color: #333; }
+        h2 { text-align: center; margin-bottom: 5px; font-size: 14pt; }
+        p.subtitle { text-align: center; font-size: 8pt; color: #666; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; vertical-align: middle; }
+        th { background-color: #f2f2f2; font-size: 8.5pt; text-align: center; }
+        td { font-size: 8.5pt; }
+        .signature-img { width: 70px; height: 30px; object-fit: contain; }
     </style>
 </head>
 <body>
